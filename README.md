@@ -25,7 +25,8 @@ git clone https://github.com/eriklindernoren/PyTorch-YOLOv3.git pytorchyolo
 bash ./pytorchyolo/weights/download_weights.sh
 mv -t pytorchyolo/weights/ yolov3-tiny.weights yolov3.weights darknet53.conv.74
 
-Then run python src/bike_detections.py
+# Then run:
+python src/bike_detections.py
 ```
 
 
