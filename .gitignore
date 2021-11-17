@@ -1,3 +1,5 @@
 env/
 pytorchyolo/
 output/
+
+*.out

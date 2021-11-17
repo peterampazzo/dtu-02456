@@ -9,12 +9,24 @@ import cv2
 from pytorchyolo import detect, models
 from pytorchyolo.utils.utils import load_classes
 import csv
+import logging
+import sys
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="[%(asctime)s] - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    stream=sys.stdout,
+)
 
 img_root = "/work1/fbohy/Helmet/images/"
 yolo_root = "pytorchyolo/"
 csv_root = "output/"
 
+logging.info("Application started.")
+
 if not os.path.exists(csv_root):
+    logging.debug("Output folder created")
     os.makedirs(csv_root)
 
 # Load the YOLO model
@@ -35,6 +47,7 @@ for l1 in subdir_l1:
     for l2 in subdir_l2:
         current_folder = l2.split("/")[-1]
         data = []
+        logging.info(f"Folder: {current_folder}")
         for f in os.scandir(l2):
             current_file = f.path.split("/")[-1].split(".")[0]
 
@@ -63,3 +76,6 @@ for l1 in subdir_l1:
             writer = csv.writer(output_file)
             writer.writerow(csv_header)
             writer.writerows(data)
+            logging.debug(f"Completed: {current_folder}.")
+
+logging.info("Completed.")
