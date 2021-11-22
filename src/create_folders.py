@@ -14,7 +14,7 @@ logging.basicConfig(
 
 training, test, val = [], [], []
 
-root = "/work1/fbohy/Helmet"
+root = "/Users/rampazzo/GitHub/data"
 filename = f"{root}/data_split.csv"
 
 folders = [
@@ -31,17 +31,20 @@ with open(filename, "r") as csvfile:
     datareader = csv.reader(csvfile)
     next(datareader)
     for annot, split_type in datareader:
-        folder_source = f"{root}/images/{annot}/"
-        logging.debug(f"Folder: {folder_source} - {split_type}")
+        try:
+            folder_source = f"{root}/images/{annot}/"
+            logging.debug(f"Folder: {folder_source} - {split_type}")
 
-        if split_type == "training":
-            training.append(annot)
-            shutil.move(folder_source, folders[0])
+            if split_type == "training":
+                training.append(annot)
+                shutil.move(folder_source, folders[0])
 
-        elif split_type == "test":
-            test.append(annot)
-            shutil.move(folder_source, folders[1])
+            elif split_type == "test":
+                test.append(annot)
+                shutil.move(folder_source, folders[1])
 
-        elif split_type == "validation":
-            val.append(annot)
-            shutil.move(folder_source, folders[2])
+            elif split_type == "validation":
+                val.append(annot)
+                shutil.move(folder_source, folders[2])
+        except:
+            logging.debug(f"Error with: {annot}.")
