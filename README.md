@@ -1,11 +1,32 @@
 # dtu-02456
 
-Local setup:
+### How to set up local env:
 
 ```
 virtualenv env
-source env/bin/activate
+source env/bin/activate # MacOS
+.\env\Scripts\activate # Windows
+pip install --upgrade pip
 pip -r requirements.txt
+```
+
+### How to run Jupyter locally:
+```
+# cd into project folder
+source env/bin/activate # MacOS
+.\env\Scripts\activate # Windows
+
+jupyter lab
+```
+
+### How to run bike detection script:
+```
+git clone https://github.com/eriklindernoren/PyTorch-YOLOv3.git pytorchyolo
+bash ./pytorchyolo/weights/download_weights.sh
+mv -t pytorchyolo/weights/ yolov3-tiny.weights yolov3.weights darknet53.conv.74
+
+# Then run:
+python src/bike_detections.py
 ```
 
 
