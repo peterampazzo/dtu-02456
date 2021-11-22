@@ -39,7 +39,7 @@ classes_allowed = [
     3
 ]  # https://github.com/eriklindernoren/PyTorch-YOLOv3/blob/master/data/coco.names
 
-csv_header = ["frame", "x", "y", "w", "h", "label"]
+csv_header = ["frame", "x", "y", "w", "h", "confidence", "label"]
 subdir_l1 = [f.path for f in os.scandir(img_root) if f.is_dir()]
 
 for l1 in subdir_l1:
