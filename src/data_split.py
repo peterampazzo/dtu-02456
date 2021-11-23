@@ -4,9 +4,19 @@ import numpy as np
 from csv import reader
 import shutil
 import logging
+import sys
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="[%(asctime)s] - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    stream=sys.stdout,
+)
 
 
 def load_from_csv(path: str, video_id_col: int = 0, set_col: int = 1):
+    logging.info("Splitting data from csv file.")
+    logging.debug(f"File loadede: {path}.")
     train, val, test = [], [], []
     with open(path, "r") as read_obj:
         csv_reader = reader(read_obj)
@@ -21,7 +31,7 @@ def load_from_csv(path: str, video_id_col: int = 0, set_col: int = 1):
 
 
 def generate_random_sets(path: str, train_r: float, val_r: float):
-    all_video_clips = [f for f in os.listdir(path)]
+    all_video_clips = [os.path.join(path, f) for f in os.listdir(path)]
     n_videos = len(all_video_clips)
     random.shuffle(all_video_clips)
 
@@ -31,44 +41,49 @@ def generate_random_sets(path: str, train_r: float, val_r: float):
     ]
     train, val, test = np.split(all_video_clips, indicies_for_splitting)
 
+    logging.debug(f"Size training set: {len(train)}.")
+    logging.debug(f"Size validation set: {len(val)}.")
+    logging.debug(f"Size test set: {len(test)}.")
+
     return train, val, test
 
 
 def create_directory(path: str):
     if not os.path.exists(path):
-        logging.debug("Output folder created")
+        logging.debug(f"Output folder {path} created.")
         os.makedirs(path)
 
 
-def split_data(path: str, train: list, val: list, test: list):
-
-    folders = [
-        f"{path}/Myanmar_data/training_set/image/",
-        f"{path}/Myanmar_data/test_set/image/",
-        f"{path}/Myanmar_data/val_set/image/",
-    ]
-
+def move_directories(folders: list, destination: str, set_name: str):
     for i in folders:
-        create_directory(i)
+        shutil.copy(i, destination)
+        logging.debug(f"Copying {i} to {set_name} folder.")
 
-    for t in train:
-        shutil.copy(path, folders[0])
-        print(f"move {t} to training folder")
 
-    for v in val:
-        shutil.copy(path, folders[1])
-        print(f"move {v} to validation folder")
+def split_data(destination: str, train: list, val: list, test: list):
 
-    for t in test:
-        shutil.copy(path, folders[2])
-        print(f"move {t} to test folder")
-    print(len(train))
-    print(len(val))
-    print(len(test))
+    data = {
+        "train": {
+            "dest": f"{destination}/Myanmar_data/training_set/image/",
+            "folders": train,
+        },
+        "test": {
+            "dest": f"{destination}/Myanmar_data/test_set/image/",
+            "folders": test,
+        },
+        "val": {"dest": f"{destination}/Myanmar_data/val_set/image/", "folders": val},
+    }
+
+    for i in data:
+        create_directory(data[i]["dest"])
+        move_directories(data[i]["folders"], data[i]["dest"], i)
 
 
 if __name__ == "__main__":
-    path = "part2"
+    logging.info("Application started.")
+
+    origin = "/work1/fbohy/Helmet/"
+    destination = "/work3/s203257/"
     # load_from_csv()
-    train, val, test = generate_random_sets(path, 0.7, 0.1)
-    split_data(path, train, val, test)
+    train, val, test = generate_random_sets(origin, 0.7, 0.1)
+    split_data(destination, train, val, test)
