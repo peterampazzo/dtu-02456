@@ -2,7 +2,7 @@ import os
 import random
 import numpy as np
 from csv import reader
-import shutil
+from distutils.dir_util import copy_tree
 import logging
 import sys
 
@@ -62,7 +62,7 @@ def create_directory(path: str):
 
 def move_directories(folders: list, destination: str, set_name: str):
     for i in folders:
-        shutil.copy_tree(i, destination)
+        copy_tree(i, destination)
         logging.debug(f"Copying {i} to {set_name} folder.")
 
 
