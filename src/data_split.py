@@ -62,7 +62,8 @@ def create_directory(path: str):
 
 def move_directories(folders: list, destination: str, set_name: str):
     for i in folders:
-        copy_tree(i, destination)
+        directory = os.path.basename(os.path.normpath(i))
+        copy_tree(i, os.path.join(destination, directory))
         logging.debug(f"Copying {i} to {set_name} folder.")
 
 
