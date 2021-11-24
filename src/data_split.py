@@ -62,7 +62,7 @@ def create_directory(path: str):
 
 def move_directories(folders: list, destination: str, set_name: str):
     for i in folders:
-        shutil.copy(i, destination)
+        shutil.copy_tree(i, destination)
         logging.debug(f"Copying {i} to {set_name} folder.")
 
 
