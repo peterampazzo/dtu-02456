@@ -1,4 +1,16 @@
+"""
+The code takes all the frames stored in the 'raw' folder and split it into train, test and
+validation folders in a new folder called 'processed'.
+
+It is possible to specify which project by command line.
+
+Usage: python src/data_split.py <Project> # random
+python src/data_split.py <Project> --csv # load sets from csv
+"""
+
+
 import os
+import argparse
 import random
 import numpy as np
 from csv import reader
@@ -91,11 +103,27 @@ def split_data(destination: str, train: list, val: list, test: list):
 if __name__ == "__main__":
     logging.info("Application started.")
 
-    project = "Nepal"
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "Project",
+        metavar="project",
+        type=str,
+    )
+    parser.add_argument("--csv", action="store_true")
+    args = parser.parse_args()
+
+    project = args.Project
     main_folder = "/work3/s203257/"
     origin = f"{main_folder}/{project}_raw/"
     destination = f"{main_folder}/{project}_processed/"
 
-    train, val, test = load_from_csv(main_folder, f"{project}_annotation.csv", f"{project}_raw")
-    # train, val, test = generate_random_sets(origin, 0.7, 0.1)
+    if args.csv:
+        logging.info(f"Running project {project} on csv file.")
+        train, val, test = load_from_csv(
+            main_folder, f"{project}_annotation.csv", f"{project}_raw"
+        )
+    else:
+        logging.info(f"Running project {project} with a random set.")
+        train, val, test = generate_random_sets(origin, 0.7, 0.1)
     split_data(destination, train, val, test)
