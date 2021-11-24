@@ -95,6 +95,6 @@ if __name__ == "__main__":
     origin = f"{main_folder}/{project}_raw/"
     destination = f"{main_folder}/{project}_processed/"
 
-    train, val, test = load_from_csv(origin, "annotation.csv", f"{project}_raw")
+    train, val, test = load_from_csv(main_folder, f"{project}_annotation.csv", f"{project}_raw")
     # train, val, test = generate_random_sets(origin, 0.7, 0.1)
     split_data(destination, train, val, test)
