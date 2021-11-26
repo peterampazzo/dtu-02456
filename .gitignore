@@ -5,3 +5,6 @@ output/
 
 *.out
 .DS_Store
+
+logs/
+*.pyc

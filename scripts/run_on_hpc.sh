@@ -15,13 +15,6 @@
 ### -- send notification at completion--
 #BSUB -N
 
-if [[ $# -eq 0 ]] ; then
-    echo 'No script name passed.'
-    exit 0
-fi
-
-script=$1
-
 module load python3/3.7.11
 module load cuda/11.3
 module load cudnn/v8.2.0.53-prod-cuda-11.3
@@ -34,5 +27,5 @@ echo "Running script..."
 pip3 install --user torch==1.10.0+cu113 torchvision==0.11.1+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 pip3 install --user scikit-image[optional] tqdm
 
-python3 ../src/${script}.py
+python3 src/classification_encode.py
 echo "Completed."
