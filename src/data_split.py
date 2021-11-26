@@ -19,7 +19,7 @@ import logging
 import sys
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="[%(asctime)s] - %(levelname)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     stream=sys.stdout,
@@ -70,12 +70,13 @@ def dump_data_split(filename: str, files: str, train: list, val: list, test: lis
     data = []
 
     for item in files:
+        folder = os.path.basename(os.path.normpath(item))
         if item in train:
-            data.append([item, "training"])
+            data.append([folder, "training"])
         if item in val:
-            data.append([item, "validation"])
+            data.append([folder, "validation"])
         if item in test:
-            data.append([item, "test"])
+            data.append([folder, "test"])
 
     with open(filename, "w", encoding="UTF8", newline="") as f:
         writer = csv.writer(f)
@@ -92,7 +93,7 @@ def create_directory(path: str):
 def move_directories(folders: list, destination: str, set_name: str):
     for i in folders:
         directory = os.path.basename(os.path.normpath(i))
-        copy_tree(i, os.path.join(destination, directory))
+        copy_tree(str(i), os.path.join(destination, directory))
         logging.debug(f"Copying {i} to {set_name} folder.")
 
 
@@ -105,6 +106,10 @@ def create_annotation_files(
     # logging.debug(f"File loaded: {file_path}.")
 
     create_directory(f"{root}/{project}_annot/")
+
+    train = [os.path.basename(os.path.normpath(i)) for i in train]
+    val = [os.path.basename(os.path.normpath(i)) for i in val]
+    test = [os.path.basename(os.path.normpath(i)) for i in test]
 
     data = {
         "train": {
@@ -173,10 +178,7 @@ if __name__ == "__main__":
 
     project = args.Project
     main_folder = "/work3/s203257/"
-    origin = {
-        "Myanmar": f"{main_folder}/{project}_raw/",
-        "Nepal": "/work1/fbohy/_Data for Frederik and Chris/Nepal video data - Frames and annotation/sample_frames"
-    }
+    origin = f"{main_folder}/{project}_raw/"
     destination = f"{main_folder}/{project}_processed/"
 
     if args.csv:
@@ -186,10 +188,12 @@ if __name__ == "__main__":
         )
     else:
         logging.info(f"Running project {project} with a random set.")
-        files, train, val, test = generate_random_sets(origin[project], 0.7, 0.1)
+        files, train, val, test = generate_random_sets(origin, 0.7, 0.1)
         dump_data_split(
             f"{main_folder}{project}_data_split.csv", files, train, val, test
         )
     split_data(destination, train, val, test)
 
     create_annotation_files(project, main_folder, train, val, test)
+
+    logging.info("Completed.")
