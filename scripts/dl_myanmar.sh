@@ -36,4 +36,4 @@ done
 # Download csv file with annotations
 cd ..
 wget https://osf.io/q7rmb/download
-mv download Myanmar_annotation.csv
+mv download Myanmar_data_split.csv

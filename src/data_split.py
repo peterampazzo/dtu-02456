@@ -13,7 +13,7 @@ import os
 import argparse
 import random
 import numpy as np
-from csv import reader
+import csv
 from distutils.dir_util import copy_tree
 import logging
 import sys
@@ -36,7 +36,7 @@ def load_from_csv(
 
     train, val, test = [], [], []
     with open(file_path, "r") as read_obj:
-        csv_reader = reader(read_obj)
+        csv_reader = csv.reader(read_obj)
         for row in csv_reader:
             folder_path = os.path.join(path, directory, row[video_id_col])
             if row[set_col] == "training":
@@ -63,7 +63,24 @@ def generate_random_sets(path: str, train_r: float, val_r: float):
     logging.debug(f"Size validation set: {len(val)}.")
     logging.debug(f"Size test set: {len(test)}.")
 
-    return train, val, test
+    return all_video_clips, train, val, test
+
+
+def dump_data_split(filename: str, files: str, train: list, val: list, test: list):
+    data = []
+
+    for item in files:
+        if item in train:
+            data.append([item, "training"])
+        if item in val:
+            data.append([item, "validation"])
+        if item in test:
+            data.append([item, "test"])
+
+    with open(filename, "w", encoding="UTF8", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["video_id", "Set"])
+        writer.writerows(data)
 
 
 def create_directory(path: str):
@@ -77,6 +94,47 @@ def move_directories(folders: list, destination: str, set_name: str):
         directory = os.path.basename(os.path.normpath(i))
         copy_tree(i, os.path.join(destination, directory))
         logging.debug(f"Copying {i} to {set_name} folder.")
+
+
+def create_annotation_files(
+    project: str, root: str, train: list, val: list, test: list, frame_id: int = 0
+):
+    file_path = os.path.join(root, f"{project}_annotation_merged.csv")
+
+    # logging.info("Splitting data from csv file.")
+    # logging.debug(f"File loaded: {file_path}.")
+
+    create_directory(f"{root}/{project}_annot/")
+
+    data = {
+        "train": {
+            "dest": f"{root}/{project}_annot/training_set.csv",
+            "data": [],
+        },
+        "test": {
+            "dest": f"{root}/{project}_annot/test_set.csv",
+            "data": [],
+        },
+        "val": {"dest": f"{root}/{project}_annot/val_set.csv", "data": []},
+    }
+
+    with open(file_path, "r") as read_obj:
+        csv_reader = csv.reader(read_obj)
+        for row in csv_reader:
+            if row[frame_id] in train:
+                data["train"]["data"].append(row)
+            if row[frame_id] in val:
+                data["val"]["data"].append(row)
+            if row[frame_id] in test:
+                data["test"]["data"].append(row)
+
+    for i in data:
+        with open(data[i]["dest"], "w", encoding="UTF8", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(
+                ["video_id", "track_id", "frame_id", "x", "y", "w", "h", "label"]
+            )
+            writer.writerows(data[i]["data"])
 
 
 def split_data(destination: str, train: list, val: list, test: list):
@@ -115,15 +173,23 @@ if __name__ == "__main__":
 
     project = args.Project
     main_folder = "/work3/s203257/"
-    origin = f"{main_folder}/{project}_raw/"
+    origin = {
+        "Myanmar": f"{main_folder}/{project}_raw/",
+        "Nepal": "/work1/fbohy/_Data for Frederik and Chris/Nepal video data - Frames and annotation/sample_frames"
+    }
     destination = f"{main_folder}/{project}_processed/"
 
     if args.csv:
         logging.info(f"Running project {project} on csv file.")
         train, val, test = load_from_csv(
-            main_folder, f"{project}_annotation.csv", f"{project}_raw"
+            main_folder, f"{project}_data_split.csv", f"{project}_raw"
         )
     else:
         logging.info(f"Running project {project} with a random set.")
-        train, val, test = generate_random_sets(origin, 0.7, 0.1)
+        files, train, val, test = generate_random_sets(origin[project], 0.7, 0.1)
+        dump_data_split(
+            f"{main_folder}{project}_data_split.csv", files, train, val, test
+        )
     split_data(destination, train, val, test)
+
+    create_annotation_files(project, main_folder, train, val, test)
