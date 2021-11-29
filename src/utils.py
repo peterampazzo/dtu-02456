@@ -231,7 +231,14 @@ def helmet_use_encode():
 class HelmetDataset(Dataset):
     """HELMET dataset."""
 
-    def __init__(self, ids, root_dir, names_to_labels, transform=None):
+    def __init__(
+        self,
+        ids,
+        root_dir,
+        names_to_labels,
+        transform=None,
+        video_frame_as_string=False,
+    ):
         """
         Args:
             csv_file (string): Path to the csv file with annotations.
@@ -252,13 +259,13 @@ class HelmetDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        im_path = (
-            self.root_dir
-            + self.ids.iloc[idx, 0]
-            + "/"
-            + "{0:02d}".format(self.ids.iloc[idx, 2])
-            + ".jpg"
+        filename = (
+            "{0}".format(self.ids.iloc[idx, 2])
+            if video_frame_as_string
+            else "{0:02d}".format(self.ids.iloc[idx, 2])
         )
+
+        im_path = self.root_dir + self.ids.iloc[idx, 0] + "/" + filename + ".jpg"
         image = Image.open(im_path)
 
         crop_image = image.crop(
