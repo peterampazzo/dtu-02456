@@ -96,6 +96,14 @@ model_ft = models.resnet34(pretrained=True)
 num_ftrs = model_ft.fc.in_features
 model_ft.fc = nn.Linear(num_ftrs, 10)
 
+# freeze the first 6 layers
+ct = 0
+for child in model_ft.children():
+    ct += 1
+    if ct < 7:
+        for param in child.parameters():
+            param.requires_grad = False
+
 model_ft = model_ft.to(device)
 
 # Observe that all parameters are being optimized
