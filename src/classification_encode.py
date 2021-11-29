@@ -14,7 +14,18 @@ from torch.optim import lr_scheduler
 from tqdm import tqdm
 from utils import *
 
-project = "Myanmar"
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    "Project",
+    metavar="project",
+    type=str,
+)
+args = parser.parse_args()
+
+project = args.Project
+
 main_folder = "/work3/s203257"
 origin = f"{main_folder}/{project}_raw/"
 destination = f"{main_folder}/{project}_processed/"
