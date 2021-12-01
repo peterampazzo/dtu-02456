@@ -19,7 +19,7 @@ import logging
 import sys
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format="[%(asctime)s] - %(levelname)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     stream=sys.stdout,
@@ -51,7 +51,7 @@ def load_from_csv(
 def generate_random_sets(path: str, train_r: float, val_r: float):
     all_video_clips = [os.path.join(path, f) for f in os.listdir(path)]
     n_videos = len(all_video_clips)
-    random.shuffle(all_video_clips)
+    random.Random(42).shuffle(all_video_clips)
 
     indicies_for_splitting = [
         int(n_videos * train_r),

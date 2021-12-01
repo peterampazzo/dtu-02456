@@ -13,7 +13,19 @@ import torch.optim as optim
 from torch.optim import lr_scheduler
 from tqdm import tqdm
 from utils import *
+import argparse
 
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    "Project",
+    metavar="project",
+    type=str,
+)
+args = parser.parse_args()
+
+project = args.Project
 
 project = "Nepal"
 main_folder = "/work3/s203257"
@@ -22,9 +34,16 @@ destination = f"{main_folder}/{project}_processed/"
 
 batch_size = 32
 input_shape = (192, 192, 3)
-train_ids = pd.read_csv(f"{main_folder}/{project}_annot/training_set.csv")
-val_ids = pd.read_csv(f"{main_folder}/{project}_annot/val_set.csv")
-test_ids = pd.read_csv(f"{main_folder}/{project}_annot/test_set.csv")
+train_ids = pd.read_csv(
+    f"{main_folder}/{project}_annot/training_set.csv",
+)  # dtype={'frame_id': 'str'})
+val_ids = pd.read_csv(
+    f"{main_folder}/{project}_annot/val_set.csv",
+)  # dtype={'frame_id': 'str'})
+test_ids = pd.read_csv(
+    f"{main_folder}/{project}_annot/test_set.csv",
+)  # dtype={'frame_id': 'str'})
+
 print("training data:", len(train_ids))
 print("valid data:", len(val_ids))
 print("test data:", len(test_ids))
@@ -283,7 +302,7 @@ acc, loss = run_model(model_ft)
 print("Loss: {:.4f} Acc: {:.4f}".format(loss, acc))
 
 
-savepath = "save_model/nepal-encode.pt"
+savepath = f"save_model/{project}-encode.pt"
 model_ft, epoch_ACCs = train_model(
     model_ft, optimizer_ft, exp_lr_scheduler, num_epochs=10
 )
@@ -291,7 +310,7 @@ torch.save(model_ft.state_dict(), savepath)
 # torch.save(model_ft, savepath)
 print(epoch_ACCs)
 
-savepath = "save_model/nepal-encode.pt"
+savepath = f"save_model/{project}-encode.pt"
 model_ft.load_state_dict(torch.load(savepath))
 model_ft.eval()
 

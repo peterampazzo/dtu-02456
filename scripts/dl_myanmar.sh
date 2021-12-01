@@ -33,7 +33,13 @@ do
     ((count=count+1))
 done
 
-# Download csv file with annotations
+# Download csv file with data split
 cd ..
 wget https://osf.io/q7rmb/download
 mv download Myanmar_data_split.csv
+
+# Download csv file with annotation
+wget https://osf.io/buh57/download
+unzip download
+rm download
+mv annotation Myanmar_annotations
