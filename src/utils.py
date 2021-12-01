@@ -251,6 +251,7 @@ class HelmetDataset(Dataset):
         self.transform = transform
         self.names_to_labels = names_to_labels
         self.num_class = len(names_to_labels)
+        self.video_frame_as_string = video_frame_as_string
 
     def __len__(self):
         return len(self.ids)
@@ -261,7 +262,7 @@ class HelmetDataset(Dataset):
 
         filename = (
             "{0}".format(self.ids.iloc[idx, 2])
-            if video_frame_as_string
+            if self.video_frame_as_string
             else "{0:02d}".format(self.ids.iloc[idx, 2])
         )
 
