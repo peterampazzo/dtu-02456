@@ -27,6 +27,7 @@ args = parser.parse_args()
 
 project = args.Project
 
+project = "Nepal"
 main_folder = "/work3/s203257"
 origin = f"{main_folder}/{project}_raw/"
 destination = f"{main_folder}/{project}_processed/"
@@ -47,7 +48,8 @@ print("training data:", len(train_ids))
 print("valid data:", len(val_ids))
 print("test data:", len(test_ids))
 
-dataset_sizes = {"train": len(train_ids), "val": len(val_ids), "test": len(test_ids)}
+dataset_sizes = {"train": len(train_ids), "val": len(
+    val_ids), "test": len(test_ids)}
 print(dataset_sizes)
 
 """Load loss function and metric"""
@@ -106,6 +108,13 @@ dataloaders = {
     "val": DataLoader(val_set, batch_size=batch_size, shuffle=False, num_workers=4),
     "test": DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=4),
 }
+
+# merge all the data together for testing
+dataloaders = {
+    "train": DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=4),
+    "val": DataLoader(val_set, batch_size=batch_size, shuffle=False, num_workers=4),
+    "test": DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=4),
+}
 print(dataloaders)
 
 
@@ -114,6 +123,14 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model_ft = models.resnet34(pretrained=True)
 num_ftrs = model_ft.fc.in_features
 model_ft.fc = nn.Linear(num_ftrs, 10)
+
+# freeze the first 6 layers
+ct = 0
+for child in model_ft.children():
+    ct += 1
+    if ct < 7:
+        for param in child.parameters():
+            param.requires_grad = False
 
 model_ft = model_ft.to(device)
 
@@ -132,6 +149,9 @@ def train_model(model, optimizer, scheduler, num_epochs=1):
     # best_loss = np.Inf
     best_acc = 0
     epoch_ACCs = []
+
+    train_losses = []
+    validation_losses = []
 
     for epoch in range(num_epochs):
         print("Epoch {}/{}".format(epoch + 1, num_epochs))
@@ -184,12 +204,18 @@ def train_model(model, optimizer, scheduler, num_epochs=1):
 
             if phase == "train":
                 scheduler.step()
+                train_losses.append(epoch_loss)
+            if phase == "val":
+                validation_losses.append(epoch_loss)
 
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
             epoch_ACCs.append(epoch_acc.item())
 
-            print("{} Loss: {:.4f} Acc: {:.4f}".format(phase, epoch_loss, epoch_acc))
+            validation_losses.append(epoch_loss)
+
+            print("{} Loss: {:.4f} Acc: {:.4f}".format(
+                phase, epoch_loss, epoch_acc))
 
             # deep copy the model
             if phase == "val" and epoch_acc > best_acc:
@@ -207,9 +233,74 @@ def train_model(model, optimizer, scheduler, num_epochs=1):
     # print('Best val loss: {:4f}'.format(best_loss))
     print("Best val Acc: {:4f}".format(best_acc))
 
+    epoch = np.arange(num_epochs)
+    plt.figure()
+    plt.plot(epoch, train_losses, 'r', label='Training loss',)
+    plt.plot(epoch, validation_losses, 'b', label='Validation loss')
+    plt.legend()
+    plt.xlabel('Epoch'), plt.ylabel('NLL')
+    plt.show()
+    plt.savefig(f'{project}-plot.png')
+
     # load best model weights
     model.load_state_dict(best_model_wts)
     return model, epoch_ACCs
+
+
+def run_model(model):
+    running_loss = 0.0
+    running_corrects = 0.0
+
+    # inputs, labels = train_set["image"], train_set["label"]
+    # inputs, labels = inputs.type(torch.cuda.FloatTensor), labels.type(torch.cuda.FloatTensor)
+    # inputs, labels = inputs.to(device), labels.to(device)
+
+    # outputs = model(inputs)
+    # # _, preds = torch.max(outputs, 1)
+    # num_correct = encode_metric(outputs, labels)/len(train_ids)
+    # # print(preds.shape,labels.shape)
+    # loss = loss_fn(outputs, labels)/len(train_ids)
+
+    # #loss = running_loss / dataset_sizes[phase]
+    # #acc = running_corrects.double() / dataset_sizes[phase]
+
+    # return num_correct
+
+    sigmoid = nn.Sigmoid()
+    phase = "test"
+    y_pred = []
+    running_loss = 0.0
+    running_corrects = 0.0
+    for i_batch, sample_batched in enumerate(dataloaders[phase]):
+        inputs, labels = sample_batched["image"], sample_batched["label"]
+        inputs, labels = inputs.type(torch.cuda.FloatTensor), labels.type(
+            torch.cuda.FloatTensor
+        )
+        inputs, labels = inputs.to(device), labels.to(device)
+
+        outputs = model(inputs)
+        outputs_ = sigmoid(outputs).cpu()
+        y_pred.append(outputs_.detach().numpy())
+
+        num_correct = encode_metric(outputs, labels)
+        loss = loss_fn(outputs, labels)
+
+        running_loss += loss.item() * inputs.size(0)
+        running_corrects += num_correct
+
+        if i_batch % 50 == 49:
+            print("[%5d] loss: %.3f" %
+                  (i_batch + 1, running_loss / (i_batch * 20)))
+
+    epoch_loss = running_loss / dataset_sizes[phase]
+    epoch_acc = running_corrects.double() / dataset_sizes[phase]
+
+    return epoch_acc, epoch_loss
+
+
+acc, loss = run_model(model_ft)
+
+print("Loss: {:.4f} Acc: {:.4f}".format(loss, acc))
 
 
 savepath = f"save_model/{project}-encode.pt"
@@ -239,14 +330,16 @@ for i_batch, sample_batched in enumerate(dataloaders[phase]):
     outputs = model_ft(inputs)
     outputs_ = sigmoid(outputs).cpu()
     y_pred.append(outputs_.detach().numpy())
+
     num_correct = encode_metric(outputs, labels)
     loss = loss_fn(outputs, labels)
+
     running_loss += loss.item() * inputs.size(0)
     running_corrects += num_correct
 
     if i_batch % 50 == 49:
-        print("[%5d] loss: %.3f" % (i_batch + 1, running_loss / (i_batch * 20)))
-
+        print("[%5d] loss: %.3f" %
+              (i_batch + 1, running_loss / (i_batch * 20)))
 
 epoch_loss = running_loss / dataset_sizes[phase]
 epoch_acc = running_corrects.double() / dataset_sizes[phase]
