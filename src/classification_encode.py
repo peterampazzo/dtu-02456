@@ -240,6 +240,7 @@ def train_model(model, optimizer, scheduler, num_epochs=1):
     plt.legend()
     plt.xlabel('Epoch'), plt.ylabel('NLL')
     plt.show()
+    plt.savefig(f'{project}-plot.png')
 
     # load best model weights
     model.load_state_dict(best_model_wts)
