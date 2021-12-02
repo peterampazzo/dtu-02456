@@ -163,7 +163,7 @@ def run_model(model):
     overall_acc = 0.0
 
 
-    for phase in ["train","train", "val"]:
+    for phase in ["train", "test", "val"]:
 
         running_loss = 0.0
         running_corrects = 0.0
@@ -192,13 +192,13 @@ def run_model(model):
         epoch_acc = running_corrects.double() / dataset_sizes[phase]
 
         overall_loss += epoch_loss
-        overall_acc += running_corrects
+        overall_acc += epoch_acc
 
         print("{} Loss: {:.4f} Acc: {:.4f}".format(phase, epoch_loss, epoch_acc))
 
                 
 
-    return running_loss, running_corrects
+    return overall_acc/3, overall_loss/3
 
 
 savepath = f"save_model/{project}-encode.pt"

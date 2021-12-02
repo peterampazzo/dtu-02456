@@ -2,9 +2,11 @@ env/
 
 pytorchyolo/
 output/
+save_model/
 
 *.out
 .DS_Store
 
 logs/
 *.pyc
+
