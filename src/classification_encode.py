@@ -28,10 +28,13 @@ args = parser.parse_args()
 project = args.Project
 
 load_model = True
+fine_tuning = False
 main_folder = "/work3/s203257"
 origin = f"{main_folder}/{project}_raw/"
 destination = f"{main_folder}/{project}_processed/"
 model_path=f"save_model/Myanmar-encode.pt"
+
+print(f"Running project {project} load_model: {load_model} model: {model_path}")
 
 batch_size = 32
 input_shape = (192, 192, 3)
@@ -121,13 +124,14 @@ model_ft.fc = nn.Linear(num_ftrs, 10)
 if load_model:
     model_ft.load_state_dict(torch.load(model_path))
 
-# freeze the first 6 layers
-ct = 0
-for child in model_ft.children():
-    ct += 1
-    if ct < 9:
-        for param in child.parameters():
-            param.requires_grad = False
+if fine_tuning:
+    # freeze the first 6 layers
+    ct = 0
+    for child in model_ft.children():
+        ct += 1
+        if ct < 9:
+            for param in child.parameters():
+                param.requires_grad = False
 
 model_ft = model_ft.to(device)
 
@@ -178,7 +182,7 @@ def train_model(model, optimizer, scheduler, num_epochs=1):
 
                 # forward
                 # track history if only in train
-                if phase == "train":
+                if fine_tuning == True and phase == "train":
                     outputs = model(inputs)
                     # _, preds = torch.max(outputs, 1)
                     num_correct = encode_metric(outputs, labels)
@@ -212,17 +216,15 @@ def train_model(model, optimizer, scheduler, num_epochs=1):
             #                     print('[%d, %5d] loss: %.3f' %
             #                           (epoch + 1, i_batch + 1, running_loss / (i_batch*20)))
 
+            epoch_loss = running_loss / dataset_sizes[phase]
+            epoch_acc = running_corrects.double() / dataset_sizes[phase]
+            epoch_ACCs.append(epoch_acc.item())
+
             if phase == "train":
                 scheduler.step()
                 train_losses.append(epoch_loss)
             if phase == "val":
                 validation_losses.append(epoch_loss)
-
-            epoch_loss = running_loss / dataset_sizes[phase]
-            epoch_acc = running_corrects.double() / dataset_sizes[phase]
-            epoch_ACCs.append(epoch_acc.item())
-
-            validation_losses.append(epoch_loss)
 
             print("{} Loss: {:.4f} Acc: {:.4f}".format(
                 phase, epoch_loss, epoch_acc))
