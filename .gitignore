@@ -4,7 +4,7 @@ pytorchyolo/
 output/
 save_model/
 
-*.out
+out/
 .DS_Store
 
 logs/
