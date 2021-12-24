@@ -93,6 +93,8 @@ bsub < ./scripts/run_on_hpc.sh
 
 ## Data set
 
+Extra storage has been requested to DTU for this project. Since the provided data for Myanmar wasn't completed, we created our own copy. Moreover, to facilitate the preprocessing we made a copy of the Nepal dataset as well.
+
 #### MYANMAR
 
 ```
