@@ -17,32 +17,43 @@ import argparse
 import logging
 import sys
 from pyhocon import ConfigFactory
+from tabulate import tabulate
 
 conf = ConfigFactory.parse_file("app.conf")
 
 logging.basicConfig(
     level=logging.getLevelName(conf["logging"]["level"]),
-    format="[%(asctime)s] - %(levelname)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
+    format=conf["logging"]["format"],
+    datefmt=conf["logging"]["date"],
     stream=sys.stdout,
 )
 
 parser = argparse.ArgumentParser()
-parser.add_argument("Project", metavar="project", type=str)
+parser.add_argument("Project", metavar="project", type=str, help="Project to run.")
+parser.add_argument("--load", type=str, help="(Optional) Saved model to load.")
+parser.add_argument("--train", action=argparse.BooleanOptionalAction, help="(Optional) if model needs to be trained.")
+parser.add_argument("--tuning", action=argparse.BooleanOptionalAction, help="(Optional) if model needs to be fine tuned.")
+parser.add_argument("--save", type=str, help="(Optional) Filename for saving the model.")
 args = parser.parse_args()
 
 project = args.Project
+load_model = f"{conf['directories']['models']}/{args.load}.pt" if args.load else None
+save_path = f"{conf['directories']['models']}/{args.save}.pt" if args.save else None
+fine_tuning = args.tuning
+training = args.train
+main_folder = conf["directories"]["main"]
+origin = f"{main_folder}/{project}{conf['directories']['raw']}/"
+destination = f"{main_folder}/{project}{conf['directories']['split']}/"
 
-load_model = True
-fine_tuning = True
-training = False
-main_folder = "/work3/s203257"
-origin = f"{main_folder}/{project}_raw/"
-destination = f"{main_folder}/{project}_processed/"
-model_path = f"save_model/Myanmar-encode.pt"
-save_path = None  # f"save_model/{project}-freezed-new.pt"
-
-logging.info(f"Running project {project} load_model: {load_model} model: {model_path}")
+details = [
+    ["Project", project],
+    ["Training", training],
+    ["Fine Tuning", fine_tuning],
+    ["Model loaded", load_model],
+    ["Save model", save_path]
+]
+logging.info("Process details:")
+logging.info(tabulate(details))
 
 batch_size = 32
 input_shape = (192, 192, 3)
@@ -50,9 +61,9 @@ input_shape = (192, 192, 3)
 dtype = {"frame_id": "str"} if project != "Myanmar" else None
 video_frame_as_string = True if project != "Myanmar" else False
 
-train_ids = pd.read_csv(f"{main_folder}/{project}_annot/training_set.csv", dtype=dtype)
-val_ids = pd.read_csv(f"{main_folder}/{project}_annot/val_set.csv", dtype=dtype)
-test_ids = pd.read_csv(f"{main_folder}/{project}_annot/test_set.csv", dtype=dtype)
+train_ids = pd.read_csv(f"{main_folder}/{project}{conf['directories']['annotation']}/training_set.csv", dtype=dtype)
+val_ids = pd.read_csv(f"{main_folder}/{project}{conf['directories']['annotation']}/val_set.csv", dtype=dtype)
+test_ids = pd.read_csv(f"{main_folder}/{project}{conf['directories']['annotation']}/test_set.csv", dtype=dtype)
 
 dataset_sizes = {"train": len(train_ids), "val": len(val_ids), "test": len(test_ids)}
 logging.debug(dataset_sizes)
@@ -64,8 +75,7 @@ encode_metric = EncodeMetric()
 """Position encode"""
 names_to_labels = helmet_use_encode()
 
-print(np.array(names_to_labels["DHelmetP1NoHelmet"]))
-
+logging.debug(np.array(names_to_labels["DHelmetP1NoHelmet"]))
 
 train_set = HelmetDataset(
     ids=train_ids,
@@ -125,7 +135,7 @@ model_ft = models.resnet34() if load_model else models.resnet34(pretrained=True)
 num_ftrs = model_ft.fc.in_features
 model_ft.fc = nn.Linear(num_ftrs, 10)
 if load_model:
-    model_ft.load_state_dict(torch.load(model_path))
+    model_ft.load_state_dict(torch.load(load_model))
 
 if fine_tuning:
     # freeze the first 6 layers
@@ -278,7 +288,6 @@ def classes_accuracy(inputs, outputs):
     classes = {}
     for i in range(len(inputs)):
         stringify = "".join(str(int(e)) for e in inputs[i])
-        # print(f"{stringify}")
         if stringify not in classes:
             classes[stringify] = {}
             classes[stringify]["tot"] = 0
@@ -319,13 +328,13 @@ def run_test_on_trained_model(model):
         running_corrects += num_correct
 
         if i_batch % 50 == 49:
-            print("[%5d] loss: %.3f" % (i_batch + 1, running_loss / (i_batch * 20)))
+            logging.info("[%5d] loss: %.3f" % (i_batch + 1, running_loss / (i_batch * 20)))
 
-    print("-----GLOBAL ACCURACY-------")
-    print(global_accuracy)
+    logging.info("-----GLOBAL ACCURACY-------")
+    logging.info(global_accuracy)
     for i in global_accuracy:
         i_acc = global_accuracy[i]["num_correct"] / global_accuracy[i]["num"]
-        print(f"ID: {i} - Acc: {i_acc} - Tot: {global_accuracy[i]['num']}")
+        logging.info(f"ID: {i} - Acc: {i_acc} - Tot: {global_accuracy[i]['num']}")
 
     epoch_loss = running_loss / dataset_sizes[phase]
     epoch_acc = running_corrects.double() / dataset_sizes[phase]
