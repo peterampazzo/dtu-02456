@@ -14,47 +14,48 @@ from torch.optim import lr_scheduler
 from tqdm import tqdm
 from utils import *
 import argparse
+import logging
+import sys
+from pyhocon import ConfigFactory
 
+conf = ConfigFactory.parse_file("app.conf")
+
+logging.basicConfig(
+    level=logging.getLevelName(conf["logging"]["level"]),
+    format="[%(asctime)s] - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    stream=sys.stdout,
+)
 
 parser = argparse.ArgumentParser()
-
-parser.add_argument(
-    "Project",
-    metavar="project",
-    type=str,
-)
+parser.add_argument("Project", metavar="project", type=str)
 args = parser.parse_args()
 
 project = args.Project
 
 load_model = True
-fine_tuning = False
+fine_tuning = True
+training = False
 main_folder = "/work3/s203257"
 origin = f"{main_folder}/{project}_raw/"
 destination = f"{main_folder}/{project}_processed/"
-model_path=f"save_model/Myanmar-encode.pt"
+model_path = f"save_model/Myanmar-encode.pt"
+save_path = None  # f"save_model/{project}-freezed-new.pt"
 
-print(f"Running project {project} load_model: {load_model} model: {model_path}")
+logging.info(f"Running project {project} load_model: {load_model} model: {model_path}")
 
 batch_size = 32
 input_shape = (192, 192, 3)
-train_ids = pd.read_csv(
-    f"{main_folder}/{project}_annot/training_set.csv",
-)  # dtype={'frame_id': 'str'})
-val_ids = pd.read_csv(
-    f"{main_folder}/{project}_annot/val_set.csv",
-)  # dtype={'frame_id': 'str'})
-test_ids = pd.read_csv(
-    f"{main_folder}/{project}_annot/test_set.csv",
-)  # dtype={'frame_id': 'str'})
 
-print("training data:", len(train_ids))
-print("valid data:", len(val_ids))
-print("test data:", len(test_ids))
+dtype = {"frame_id": "str"} if project != "Myanmar" else None
+video_frame_as_string = True if project != "Myanmar" else False
 
-dataset_sizes = {"train": len(train_ids), "val": len(
-    val_ids), "test": len(test_ids)}
-print(dataset_sizes)
+train_ids = pd.read_csv(f"{main_folder}/{project}_annot/training_set.csv", dtype=dtype)
+val_ids = pd.read_csv(f"{main_folder}/{project}_annot/val_set.csv", dtype=dtype)
+test_ids = pd.read_csv(f"{main_folder}/{project}_annot/test_set.csv", dtype=dtype)
+
+dataset_sizes = {"train": len(train_ids), "val": len(val_ids), "test": len(test_ids)}
+logging.debug(dataset_sizes)
 
 """Load loss function and metric"""
 loss_fn = EncodeLoss()
@@ -79,6 +80,7 @@ train_set = HelmetDataset(
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
     ),
+    video_frame_as_string=video_frame_as_string,
 )
 
 val_set = HelmetDataset(
@@ -92,6 +94,7 @@ val_set = HelmetDataset(
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
     ),
+    video_frame_as_string=video_frame_as_string,
 )
 
 test_set = HelmetDataset(
@@ -105,6 +108,7 @@ test_set = HelmetDataset(
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
         ]
     ),
+    video_frame_as_string=video_frame_as_string,
 )
 
 dataloaders = {
@@ -113,8 +117,7 @@ dataloaders = {
     "test": DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=4),
 }
 
-print(dataloaders)
-
+logging.debug(dataloaders)
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -172,9 +175,7 @@ def train_model(model, optimizer, scheduler, num_epochs=1):
             for i_batch, sample_batched in tqdm(enumerate(dataloaders[phase])):
 
                 inputs, labels = sample_batched["image"], sample_batched["label"]
-                inputs, labels = inputs.type(torch.cuda.FloatTensor), labels.type(
-                    torch.cuda.FloatTensor
-                )
+                inputs, labels = inputs.type(torch.cuda.FloatTensor), labels.type(torch.cuda.FloatTensor)
                 inputs, labels = inputs.to(device), labels.to(device)
 
                 # zero the parameter gradients
@@ -226,8 +227,7 @@ def train_model(model, optimizer, scheduler, num_epochs=1):
             if phase == "val":
                 validation_losses.append(epoch_loss)
 
-            print("{} Loss: {:.4f} Acc: {:.4f}".format(
-                phase, epoch_loss, epoch_acc))
+            logging.debug("{} Loss: {:.4f} Acc: {:.4f}".format(phase, epoch_loss, epoch_acc))
 
             # deep copy the model
             if phase == "val" and epoch_acc > best_acc:
@@ -237,26 +237,59 @@ def train_model(model, optimizer, scheduler, num_epochs=1):
         print()
 
     time_elapsed = time.time() - since
-    print(
-        "Training complete in {:.0f}m {:.0f}s".format(
-            time_elapsed // 60, time_elapsed % 60
-        )
-    )
+    logging.info("Training complete in {:.0f}m {:.0f}s".format(time_elapsed // 60, time_elapsed % 60))
     # print('Best val loss: {:4f}'.format(best_loss))
-    print("Best val Acc: {:4f}".format(best_acc))
+    logging.info("Best val Acc: {:4f}".format(best_acc))
 
     epoch = np.arange(num_epochs)
+
     plt.figure()
-    plt.plot(epoch, train_losses, 'r', label='Training loss',)
-    plt.plot(epoch, validation_losses, 'b', label='Validation loss')
+    plt.plot(
+        epoch,
+        train_losses,
+        "r",
+        label="Training loss",
+    )
+    plt.plot(epoch, validation_losses, "b", label="Validation loss")
     plt.legend()
-    plt.xlabel('Epoch'), plt.ylabel('NLL')
+    plt.xlabel("Epoch"), plt.ylabel("NLL")
     plt.show()
-    plt.savefig(f'{project}-plot.png')
+    plt.savefig(f"{project}-plot.png")
 
     # load best model weights
     model.load_state_dict(best_model_wts)
     return model, epoch_ACCs
+
+
+def append_classes_accuracy(total, epoch):
+    for key in epoch:
+        if key not in total:
+            total[key] = {}
+            total[key]["num"] = 0
+            total[key]["num_correct"] = 0
+
+        total[key]["num"] += epoch[key]["tot"]
+        total[key]["num_correct"] += epoch[key]["num_correct"]
+
+    return total
+
+
+def classes_accuracy(inputs, outputs):
+    classes = {}
+    for i in range(len(inputs)):
+        stringify = "".join(str(int(e)) for e in inputs[i])
+        # print(f"{stringify}")
+        if stringify not in classes:
+            classes[stringify] = {}
+            classes[stringify]["tot"] = 0
+            classes[stringify]["num_correct"] = 0
+
+        if inputs[i] == outputs[i]:
+            classes[stringify]["num_correct"] += 1
+
+        classes[stringify]["tot"] += 1
+
+    return classes
 
 
 def run_test_on_trained_model(model):
@@ -265,16 +298,19 @@ def run_test_on_trained_model(model):
     y_pred = []
     running_loss = 0.0
     running_corrects = 0.0
+    global_accuracy = {}
     for i_batch, sample_batched in enumerate(dataloaders[phase]):
         inputs, labels = sample_batched["image"], sample_batched["label"]
-        inputs, labels = inputs.type(torch.cuda.FloatTensor), labels.type(
-            torch.cuda.FloatTensor
-        )
+        inputs, labels = inputs.type(torch.cuda.FloatTensor), labels.type(torch.cuda.FloatTensor)
         inputs, labels = inputs.to(device), labels.to(device)
 
         outputs = model(inputs)
         outputs_ = sigmoid(outputs).cpu()
         y_pred.append(outputs_.detach().numpy())
+
+        outputs_labels = (sigmoid(outputs) > 0.5).type(torch.FloatTensor)
+        accuracy = classes_accuracy(labels.tolist(), outputs_labels.tolist())
+        global_accuracy = append_classes_accuracy(global_accuracy, accuracy)
 
         num_correct = encode_metric(outputs, labels)
         loss = loss_fn(outputs, labels)
@@ -283,22 +319,27 @@ def run_test_on_trained_model(model):
         running_corrects += num_correct
 
         if i_batch % 50 == 49:
-            print("[%5d] loss: %.3f" %
-                  (i_batch + 1, running_loss / (i_batch * 20)))
+            print("[%5d] loss: %.3f" % (i_batch + 1, running_loss / (i_batch * 20)))
+
+    print("-----GLOBAL ACCURACY-------")
+    print(global_accuracy)
+    for i in global_accuracy:
+        i_acc = global_accuracy[i]["num_correct"] / global_accuracy[i]["num"]
+        print(f"ID: {i} - Acc: {i_acc} - Tot: {global_accuracy[i]['num']}")
 
     epoch_loss = running_loss / dataset_sizes[phase]
     epoch_acc = running_corrects.double() / dataset_sizes[phase]
 
     return epoch_acc, epoch_loss
 
-savepath = f"save_model/{project}-encode.pt"
-model_ft, epoch_ACCs = train_model(
-    model_ft, optimizer_ft, exp_lr_scheduler, num_epochs=10
-)
-torch.save(model_ft.state_dict(), savepath)
-print(epoch_ACCs)
+
+if training:
+    model_ft, epoch_ACCs = train_model(model_ft, optimizer_ft, exp_lr_scheduler, num_epochs=10)
+    if save_path:
+        torch.save(model_ft.state_dict(), save_path)
+logging.debug(epoch_ACCs)
 
 model_ft.eval()
 
 acc, loss = run_test_on_trained_model(model_ft)
-print("TEST Loss: {:.4f} Acc: {:.4f}".format(loss, acc))
+logging.info("TEST Loss: {:.4f} Acc: {:.4f}".format(loss, acc))

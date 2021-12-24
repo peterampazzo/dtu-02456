@@ -10,3 +10,5 @@ save_model/
 logs/
 *.pyc
 
+.ipynb_checkpoints
+
