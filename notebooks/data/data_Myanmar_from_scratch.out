@@ -1,0 +1,181 @@
+Running script...
+Looking in links: https://download.pytorch.org/whl/cu113/torch_stable.html
+Requirement already satisfied: torch==1.10.0+cu113 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (1.10.0+cu113)
+Requirement already satisfied: torchvision==0.11.1+cu113 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (0.11.1+cu113)
+Requirement already satisfied: typing-extensions in /appl/python/3.7.11/lib/python3.7/site-packages (from torch==1.10.0+cu113) (3.10.0.0)
+Requirement already satisfied: numpy in /appl/numpy/1.21.1-python-3.7.11-openblas-0.3.17/lib/python3.7/site-packages/numpy-1.21.1-py3.7-linux-x86_64.egg (from torchvision==0.11.1+cu113) (1.21.1)
+Requirement already satisfied: pillow!=8.3.0,>=5.3.0 in /appl/matplotlib/3.4.2-numpy-1.21.1-python-3.7.11/lib/python3.7/site-packages/Pillow-8.3.1-py3.7-linux-x86_64.egg (from torchvision==0.11.1+cu113) (8.3.1)
+Requirement already satisfied: scikit-image[optional] in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (0.18.3)
+Requirement already satisfied: tqdm in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (4.62.3)
+Requirement already satisfied: tifffile>=2019.7.26 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from scikit-image[optional]) (2021.11.2)
+Requirement already satisfied: pillow!=7.1.0,!=7.1.1,>=4.3.0 in /appl/matplotlib/3.4.2-numpy-1.21.1-python-3.7.11/lib/python3.7/site-packages/Pillow-8.3.1-py3.7-linux-x86_64.egg (from scikit-image[optional]) (8.3.1)
+Requirement already satisfied: PyWavelets>=1.1.1 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from scikit-image[optional]) (1.2.0)
+Requirement already satisfied: numpy>=1.16.5 in /appl/numpy/1.21.1-python-3.7.11-openblas-0.3.17/lib/python3.7/site-packages/numpy-1.21.1-py3.7-linux-x86_64.egg (from scikit-image[optional]) (1.21.1)
+Requirement already satisfied: networkx>=2.0 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from scikit-image[optional]) (2.6.3)
+Requirement already satisfied: matplotlib!=3.0.0,>=2.0.0 in /appl/matplotlib/3.4.2-numpy-1.21.1-python-3.7.11/lib/python3.7/site-packages/matplotlib-3.4.2-py3.7-linux-x86_64.egg (from scikit-image[optional]) (3.4.2)
+Requirement already satisfied: scipy>=1.0.1 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from scikit-image[optional]) (1.7.2)
+Requirement already satisfied: imageio>=2.3.0 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from scikit-image[optional]) (2.12.0)
+Requirement already satisfied: SimpleITK in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from scikit-image[optional]) (2.1.1)
+Requirement already satisfied: pyamg in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from scikit-image[optional]) (4.1.0)
+Requirement already satisfied: dask[array]!=2.17.0,>=1.0.0 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from scikit-image[optional]) (2021.11.2)
+Requirement already satisfied: pooch>=1.3.0 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from scikit-image[optional]) (1.5.2)
+Requirement already satisfied: qtpy in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from scikit-image[optional]) (1.11.2)
+Requirement already satisfied: astropy>=3.1.2 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from scikit-image[optional]) (4.3.1)
+Requirement already satisfied: cloudpickle>=0.2.1 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from scikit-image[optional]) (2.0.0)
+Requirement already satisfied: importlib-metadata in /appl/python/3.7.11/lib/python3.7/site-packages (from astropy>=3.1.2->scikit-image[optional]) (4.6.3)
+Requirement already satisfied: pyerfa>=1.7.3 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from astropy>=3.1.2->scikit-image[optional]) (2.0.0.1)
+Requirement already satisfied: packaging>=20.0 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from dask[array]!=2.17.0,>=1.0.0->scikit-image[optional]) (21.3)
+Requirement already satisfied: pyyaml in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from dask[array]!=2.17.0,>=1.0.0->scikit-image[optional]) (6.0)
+Requirement already satisfied: partd>=0.3.10 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from dask[array]!=2.17.0,>=1.0.0->scikit-image[optional]) (1.2.0)
+Requirement already satisfied: toolz>=0.8.2 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from dask[array]!=2.17.0,>=1.0.0->scikit-image[optional]) (0.11.2)
+Requirement already satisfied: fsspec>=0.6.0 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from dask[array]!=2.17.0,>=1.0.0->scikit-image[optional]) (2021.11.0)
+Collecting pillow!=7.1.0,!=7.1.1,>=4.3.0
+  Using cached Pillow-8.4.0-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.1 MB)
+Requirement already satisfied: cycler>=0.10 in /appl/matplotlib/3.4.2-numpy-1.21.1-python-3.7.11/lib/python3.7/site-packages/cycler-0.10.0-py3.7.egg (from matplotlib!=3.0.0,>=2.0.0->scikit-image[optional]) (0.10.0)
+Requirement already satisfied: kiwisolver>=1.0.1 in /appl/matplotlib/3.4.2-numpy-1.21.1-python-3.7.11/lib/python3.7/site-packages/kiwisolver-1.3.1-py3.7-linux-x86_64.egg (from matplotlib!=3.0.0,>=2.0.0->scikit-image[optional]) (1.3.1)
+Requirement already satisfied: pyparsing>=2.2.1 in /appl/matplotlib/3.4.2-numpy-1.21.1-python-3.7.11/lib/python3.7/site-packages/pyparsing-3.0.0b2-py3.7.egg (from matplotlib!=3.0.0,>=2.0.0->scikit-image[optional]) (3.0.0b2)
+Requirement already satisfied: python-dateutil>=2.7 in /appl/matplotlib/3.4.2-numpy-1.21.1-python-3.7.11/lib/python3.7/site-packages/python_dateutil-2.8.2-py3.7.egg (from matplotlib!=3.0.0,>=2.0.0->scikit-image[optional]) (2.8.2)
+Requirement already satisfied: six in /appl/python/3.7.11/lib/python3.7/site-packages (from cycler>=0.10->matplotlib!=3.0.0,>=2.0.0->scikit-image[optional]) (1.16.0)
+Requirement already satisfied: locket in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from partd>=0.3.10->dask[array]!=2.17.0,>=1.0.0->scikit-image[optional]) (0.2.1)
+Requirement already satisfied: appdirs in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from pooch>=1.3.0->scikit-image[optional]) (1.4.4)
+Requirement already satisfied: requests in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from pooch>=1.3.0->scikit-image[optional]) (2.26.0)
+Requirement already satisfied: zipp>=0.5 in /appl/python/3.7.11/lib/python3.7/site-packages (from importlib-metadata->astropy>=3.1.2->scikit-image[optional]) (3.5.0)
+Requirement already satisfied: typing-extensions>=3.6.4 in /appl/python/3.7.11/lib/python3.7/site-packages (from importlib-metadata->astropy>=3.1.2->scikit-image[optional]) (3.10.0.0)
+Requirement already satisfied: pytest>=2 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from pyamg->scikit-image[optional]) (6.2.5)
+Requirement already satisfied: attrs>=19.2.0 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from pytest>=2->pyamg->scikit-image[optional]) (21.2.0)
+Requirement already satisfied: py>=1.8.2 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from pytest>=2->pyamg->scikit-image[optional]) (1.11.0)
+Requirement already satisfied: pluggy<2.0,>=0.12 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from pytest>=2->pyamg->scikit-image[optional]) (1.0.0)
+Requirement already satisfied: toml in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from pytest>=2->pyamg->scikit-image[optional]) (0.10.2)
+Requirement already satisfied: iniconfig in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from pytest>=2->pyamg->scikit-image[optional]) (1.1.1)
+Requirement already satisfied: urllib3<1.27,>=1.21.1 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from requests->pooch>=1.3.0->scikit-image[optional]) (1.26.7)
+Requirement already satisfied: certifi>=2017.4.17 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from requests->pooch>=1.3.0->scikit-image[optional]) (2021.10.8)
+Requirement already satisfied: idna<4,>=2.5 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from requests->pooch>=1.3.0->scikit-image[optional]) (3.3)
+Requirement already satisfied: charset-normalizer~=2.0.0 in /zhome/4a/3/154575/.local/lib/python3.7/site-packages (from requests->pooch>=1.3.0->scikit-image[optional]) (2.0.7)
+Installing collected packages: pillow
+Successfully installed pillow-8.4.0
+Running project Myanmar load_model: False model: save_model/Myanmar-encode-new.pt
+training data: 196602
+valid data: 31183
+test data: 55592
+{'train': 196602, 'val': 31183, 'test': 55592}
+[1 0 1 0 0 1 0 0 0 0]
+{'train': <torch.utils.data.dataloader.DataLoader object at 0x7f792ef23510>, 'val': <torch.utils.data.dataloader.DataLoader object at 0x7f792ef23610>, 'test': <torch.utils.data.dataloader.DataLoader object at 0x7f792ef236d0>}
+Epoch 1/10
+----------
+train Loss: 0.5083 Acc: 0.8259
+val Loss: 0.7300 Acc: 0.8220
+
+Epoch 2/10
+----------
+train Loss: 0.2413 Acc: 0.9109
+val Loss: 0.8293 Acc: 0.8106
+
+Epoch 3/10
+----------
+train Loss: 0.1750 Acc: 0.9338
+val Loss: 0.9394 Acc: 0.8302
+
+Epoch 4/10
+----------
+train Loss: 0.1385 Acc: 0.9467
+val Loss: 0.9946 Acc: 0.8237
+
+Epoch 5/10
+----------
+train Loss: 0.1132 Acc: 0.9554
+val Loss: 1.1526 Acc: 0.8275
+
+Epoch 6/10
+----------
+train Loss: 0.0565 Acc: 0.9754
+val Loss: 1.0940 Acc: 0.8426
+
+Epoch 7/10
+----------
+train Loss: 0.0388 Acc: 0.9817
+val Loss: 1.1482 Acc: 0.8438
+
+Epoch 8/10
+----------
+train Loss: 0.0307 Acc: 0.9847
+val Loss: 1.2107 Acc: 0.8462
+
+Epoch 9/10
+----------
+train Loss: 0.0246 Acc: 0.9869
+val Loss: 1.2849 Acc: 0.8462
+
+Epoch 10/10
+----------
+train Loss: 0.0203 Acc: 0.9887
+val Loss: 1.3009 Acc: 0.8457
+
+Training complete in 248m 33s
+Best val Acc: 0.846230
+[0.825902076275928, 0.8220184074656063, 0.9109266436760562, 0.8106339992944874, 0.93376974801884, 0.8301959400955649, 0.9467452009643849, 0.8237180515024212, 0.9554277169103061, 0.8274700958855786, 0.9754478591265603, 0.8426386171952667, 0.9816939807326477, 0.843825161145496, 0.9846695354065574, 0.8462303178013661, 0.9869482507807652, 0.8461982490459545, 0.988723410748619, 0.8456851489593689]
+[   50] loss: 0.262
+[  100] loss: 1.702
+[  150] loss: 1.985
+[  200] loss: 1.796
+[  250] loss: 1.926
+[  300] loss: 1.987
+[  350] loss: 1.896
+[  400] loss: 1.969
+[  450] loss: 1.909
+[  500] loss: 1.928
+[  550] loss: 1.862
+[  600] loss: 1.942
+[  650] loss: 1.885
+[  700] loss: 1.859
+[  750] loss: 1.772
+[  800] loss: 1.772
+[  850] loss: 1.780
+[  900] loss: 1.935
+[  950] loss: 1.983
+[ 1000] loss: 1.932
+[ 1050] loss: 1.981
+[ 1100] loss: 1.974
+[ 1150] loss: 1.986
+[ 1200] loss: 1.965
+[ 1250] loss: 2.000
+[ 1300] loss: 2.004
+[ 1350] loss: 2.014
+[ 1400] loss: 1.983
+[ 1450] loss: 1.995
+[ 1500] loss: 1.972
+[ 1550] loss: 1.973
+[ 1600] loss: 2.004
+[ 1650] loss: 2.004
+[ 1700] loss: 2.013
+-----GLOBAL ACCURACY-------
+{'1000010000': {'num': 23943, 'num_correct': 22269}, '1000000000': {'num': 8328, 'num_correct': 7328}, '1010010100': {'num': 10607, 'num_correct': 9157}, '1010000000': {'num': 5210, 'num_correct': 4068}, '1010010000': {'num': 2459, 'num_correct': 1259}, '1011010000': {'num': 541, 'num_correct': 135}, '1011000000': {'num': 1605, 'num_correct': 550}, '1011100000': {'num': 77, 'num_correct': 0}, '1110000000': {'num': 483, 'num_correct': 72}, '1011010010': {'num': 321, 'num_correct': 133}, '1110010000': {'num': 144, 'num_correct': 24}, '1010000100': {'num': 559, 'num_correct': 167}, '1100011000': {'num': 130, 'num_correct': 0}, '1100000000': {'num': 219, 'num_correct': 5}, '1110011100': {'num': 149, 'num_correct': 0}, '1111010010': {'num': 79, 'num_correct': 5}, '1110000100': {'num': 11, 'num_correct': 6}, '1110010100': {'num': 178, 'num_correct': 88}, '1111011000': {'num': 17, 'num_correct': 0}, '1011010110': {'num': 128, 'num_correct': 2}, '1111010000': {'num': 39, 'num_correct': 1}, '1111010110': {'num': 7, 'num_correct': 0}, '1111000000': {'num': 78, 'num_correct': 24}, '1100010000': {'num': 233, 'num_correct': 58}, '1011010100': {'num': 11, 'num_correct': 0}, '1011110000': {'num': 12, 'num_correct': 0}, '1011000010': {'num': 7, 'num_correct': 1}, '1011000110': {'num': 17, 'num_correct': 0}}
+ID: 1000010000 - Acc: 0.930083949379777 - Tot: 23943
+ID: 1000000000 - Acc: 0.8799231508165226 - Tot: 8328
+ID: 1010010100 - Acc: 0.8632978221928915 - Tot: 10607
+ID: 1010000000 - Acc: 0.7808061420345489 - Tot: 5210
+ID: 1010010000 - Acc: 0.5119967466449776 - Tot: 2459
+ID: 1011010000 - Acc: 0.24953789279112754 - Tot: 541
+ID: 1011000000 - Acc: 0.3426791277258567 - Tot: 1605
+ID: 1011100000 - Acc: 0.0 - Tot: 77
+ID: 1110000000 - Acc: 0.14906832298136646 - Tot: 483
+ID: 1011010010 - Acc: 0.4143302180685358 - Tot: 321
+ID: 1110010000 - Acc: 0.16666666666666666 - Tot: 144
+ID: 1010000100 - Acc: 0.29874776386404295 - Tot: 559
+ID: 1100011000 - Acc: 0.0 - Tot: 130
+ID: 1100000000 - Acc: 0.0228310502283105 - Tot: 219
+ID: 1110011100 - Acc: 0.0 - Tot: 149
+ID: 1111010010 - Acc: 0.06329113924050633 - Tot: 79
+ID: 1110000100 - Acc: 0.5454545454545454 - Tot: 11
+ID: 1110010100 - Acc: 0.4943820224719101 - Tot: 178
+ID: 1111011000 - Acc: 0.0 - Tot: 17
+ID: 1011010110 - Acc: 0.015625 - Tot: 128
+ID: 1111010000 - Acc: 0.02564102564102564 - Tot: 39
+ID: 1111010110 - Acc: 0.0 - Tot: 7
+ID: 1111000000 - Acc: 0.3076923076923077 - Tot: 78
+ID: 1100010000 - Acc: 0.24892703862660945 - Tot: 233
+ID: 1011010100 - Acc: 0.0 - Tot: 11
+ID: 1011110000 - Acc: 0.0 - Tot: 12
+ID: 1011000010 - Acc: 0.14285714285714285 - Tot: 7
+ID: 1011000110 - Acc: 0.0 - Tot: 17
+TEST Loss: 1.2399 Acc: 0.8165
+Completed.
