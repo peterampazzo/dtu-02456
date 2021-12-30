@@ -10,7 +10,8 @@
 ├── README.md                          <- The top-level README for developers using this project
 ├── notebooks                          <- All notebooks
 |   ├── inspect_model.csv              <- Inspect the achitecture of the save model 
-│   └── ...
+|   ├── train_val_acc_loss_plots.ipynb 
+│   └── within_class_graphs.ipynb
 ├── src
 |   ├── bike_detection.py            <- Bike detection using YOLOv3
 │   ├── classification_encode.py     <- Classification Encoding
