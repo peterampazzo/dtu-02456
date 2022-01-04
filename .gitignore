@@ -10,3 +10,5 @@ out/
 logs/
 *.pyc
 
+.ipynb_checkpoints
+

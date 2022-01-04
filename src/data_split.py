@@ -17,11 +17,14 @@ import csv
 from distutils.dir_util import copy_tree
 import logging
 import sys
+from pyhocon import ConfigFactory
+
+conf = ConfigFactory.parse_file("app.conf")
 
 logging.basicConfig(
-    level=logging.DEBUG,
-    format="[%(asctime)s] - %(levelname)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
+    level=logging.getLevelName(conf["logging"]["level"]),
+    format=conf["logging"]["format"],
+    datefmt=conf["logging"]["date"],
     stream=sys.stdout,
 )
 
@@ -105,7 +108,7 @@ def create_annotation_files(
     # logging.info("Splitting data from csv file.")
     # logging.debug(f"File loaded: {file_path}.")
 
-    create_directory(f"{root}/{project}_annot/")
+    create_directory(f"{root}/{project}{conf['directories']['annotation']}/")
 
     train = [os.path.basename(os.path.normpath(i)) for i in train]
     val = [os.path.basename(os.path.normpath(i)) for i in val]
@@ -113,14 +116,16 @@ def create_annotation_files(
 
     data = {
         "train": {
-            "dest": f"{root}/{project}_annot/training_set.csv",
+            "dest": f"{root}/{project}{conf['directories']['annotation']}/training_set.csv",
             "data": [],
         },
         "test": {
-            "dest": f"{root}/{project}_annot/test_set.csv",
+            "dest": f"{root}/{project}{conf['directories']['annotation']}/test_set.csv",
             "data": [],
         },
-        "val": {"dest": f"{root}/{project}_annot/val_set.csv", "data": []},
+        "val": {
+            "dest": f"{root}/{project}{conf['directories']['annotation']}/val_set.csv",
+            "data": []},
     }
 
     with open(file_path, "r") as read_obj:
@@ -173,18 +178,18 @@ if __name__ == "__main__":
         metavar="project",
         type=str,
     )
-    parser.add_argument("--csv", action="store_true")
+    parser.add_argument("--csv", action="store_true", help="(Optional) Load csv file with data split.")
     args = parser.parse_args()
 
     project = args.Project
-    main_folder = "/work3/s203257/"
-    origin = f"{main_folder}/{project}_raw/"
-    destination = f"{main_folder}/{project}_processed/"
+    main_folder = conf["directories"]["main"]
+    origin = f"{main_folder}/{project}{conf['directories']['raw']}/"
+    destination = f"{main_folder}/{project}{conf['directories']['split']}/"
 
     if args.csv:
         logging.info(f"Running project {project} on csv file.")
         train, val, test = load_from_csv(
-            main_folder, f"{project}_data_split.csv", f"{project}_raw"
+            main_folder, f"{project}_data_split.csv", f"{project}{conf['directories']['raw']}"
         )
     else:
         logging.info(f"Running project {project} with a random set.")

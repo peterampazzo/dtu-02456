@@ -18,10 +18,7 @@ class EncodeLoss(nn.Module):
         loss = 0
         for idx in range(5):
             loss += torch.mean(self.bce(self.sigmoid(outputs[:, idx]), labels[:, idx]))
-            loss += torch.mean(
-                labels[:, idx]
-                * self.bce(self.sigmoid(outputs[:, idx + 5]), labels[:, idx + 5])
-            )
+            loss += torch.mean(labels[:, idx] * self.bce(self.sigmoid(outputs[:, idx + 5]), labels[:, idx + 5]))
 
         return loss
 
@@ -35,9 +32,7 @@ class EncodeMetric(nn.Module):
         outputs_ = (self.sigmoid(outputs) > 0.5).type(torch.FloatTensor)
         outputs_[:, 5:] = outputs_[:, :5] * outputs_[:, 5:]
         labels_ = labels.to("cpu")
-        num_correct = torch.sum(
-            (torch.sum(torch.abs(outputs_ - labels_), 1) == 0).type(torch.FloatTensor)
-        )
+        num_correct = torch.sum((torch.sum(torch.abs(outputs_ - labels_), 1) == 0).type(torch.FloatTensor))
 
         return num_correct
 
@@ -68,162 +63,19 @@ def helmet_use_encode():
     names_to_labels["DNoHelmetP1NoHelmetP2Helmet"] = [1, 0, 1, 1, 0, 0, 0, 0, 1, 0]
     names_to_labels["DNoHelmetP1NoHelmetP2NoHelmet"] = [1, 0, 1, 1, 0, 0, 0, 0, 0, 0]
     names_to_labels["DHelmetP0HelmetP1HelmetP2Helmet"] = [1, 1, 1, 1, 0, 1, 1, 1, 1, 0]
-    names_to_labels["DHelmetP0HelmetP1NoHelmetP2Helmet"] = [
-        1,
-        1,
-        1,
-        1,
-        0,
-        1,
-        1,
-        0,
-        1,
-        0,
-    ]
-    names_to_labels["DHelmetP0HelmetP1NoHelmetP2NoHelmet"] = [
-        1,
-        1,
-        1,
-        1,
-        0,
-        1,
-        1,
-        0,
-        0,
-        0,
-    ]
-    names_to_labels["DHelmetP0NoHelmetP1HelmetP2Helmet"] = [
-        1,
-        1,
-        1,
-        1,
-        0,
-        1,
-        0,
-        1,
-        1,
-        0,
-    ]
-    names_to_labels["DHelmetP0NoHelmetP1NoHelmetP2Helmet"] = [
-        1,
-        1,
-        1,
-        1,
-        0,
-        1,
-        0,
-        0,
-        1,
-        0,
-    ]
-    names_to_labels["DHelmetP0NoHelmetP1NoHelmetP2NoHelmet"] = [
-        1,
-        1,
-        1,
-        1,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-    ]
-    names_to_labels["DNoHelmetP0NoHelmetP1NoHelmetP2NoHelmet"] = [
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-    ]
-    names_to_labels["DNoHelmetP0NoHelmetP1NoHelmetP2Helmet"] = [
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-    ]
-    names_to_labels["DHelmetP1NoHelmetP2NoHelmetP3NoHelmet"] = [
-        1,
-        0,
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
-    ]
-    names_to_labels["DHelmetP1NoHelmetP2NoHelmetP3Helmet"] = [
-        1,
-        0,
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
-        0,
-        1,
-    ]
-    names_to_labels["DNoHelmetP1NoHelmetP2NoHelmetP3NoHelmet"] = [
-        1,
-        0,
-        1,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-    ]
-    names_to_labels["DNoHelmetP0NoHelmetP1NoHelmetP2NoHelmetP3NoHelmet"] = [
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-    ]
-    names_to_labels["DHelmetP0NoHelmetP1NoHelmetP2NoHelmetP3Helmet"] = [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
-        0,
-        1,
-    ]
-    names_to_labels["DHelmetP0NoHelmetP1NoHelmetP2NoHelmetP3NoHelmet"] = [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
-    ]
+    names_to_labels["DHelmetP0HelmetP1NoHelmetP2Helmet"] = [1, 1, 1, 1, 0, 1, 1, 0, 1, 0]
+    names_to_labels["DHelmetP0HelmetP1NoHelmetP2NoHelmet"] = [1, 1, 1, 1, 0, 1, 1, 0, 0, 0]
+    names_to_labels["DHelmetP0NoHelmetP1HelmetP2Helmet"] = [1, 1, 1, 1, 0, 1, 0, 1, 1, 0]
+    names_to_labels["DHelmetP0NoHelmetP1NoHelmetP2Helmet"] = [1, 1, 1, 1, 0, 1, 0, 0, 1, 0]
+    names_to_labels["DHelmetP0NoHelmetP1NoHelmetP2NoHelmet"] = [1, 1, 1, 1, 0, 1, 0, 0, 0, 0]
+    names_to_labels["DNoHelmetP0NoHelmetP1NoHelmetP2NoHelmet"] = [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+    names_to_labels["DNoHelmetP0NoHelmetP1NoHelmetP2Helmet"] = [1, 1, 1, 1, 0, 0, 0, 0, 1, 0]
+    names_to_labels["DHelmetP1NoHelmetP2NoHelmetP3NoHelmet"] = [1, 0, 1, 1, 1, 1, 0, 0, 0, 0]
+    names_to_labels["DHelmetP1NoHelmetP2NoHelmetP3Helmet"] = [1, 0, 1, 1, 1, 1, 0, 0, 0, 1]
+    names_to_labels["DNoHelmetP1NoHelmetP2NoHelmetP3NoHelmet"] = [1, 0, 1, 1, 1, 0, 0, 0, 0, 0]
+    names_to_labels["DNoHelmetP0NoHelmetP1NoHelmetP2NoHelmetP3NoHelmet"] = [1, 1, 1, 1, 1, 0, 0, 0, 0, 0]
+    names_to_labels["DHelmetP0NoHelmetP1NoHelmetP2NoHelmetP3Helmet"] = [1, 1, 1, 1, 1, 1, 0, 0, 0, 1]
+    names_to_labels["DHelmetP0NoHelmetP1NoHelmetP2NoHelmetP3NoHelmet"] = [1, 1, 1, 1, 1, 1, 0, 0, 0, 0]
 
     return names_to_labels
 
@@ -260,11 +112,7 @@ class HelmetDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        filename = (
-            "{0}".format(self.ids.iloc[idx, 2])
-            if self.video_frame_as_string
-            else "{0:02d}".format(self.ids.iloc[idx, 2])
-        )
+        filename = "{0}".format(self.ids.iloc[idx, 2]) if self.video_frame_as_string else "{0:02d}".format(self.ids.iloc[idx, 2])
 
         im_path = self.root_dir + self.ids.iloc[idx, 0] + "/" + filename + ".jpg"
         image = Image.open(im_path)
