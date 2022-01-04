@@ -1,6 +1,8 @@
 # 02456 Deep Learning Project
 
-### TRANSFER LEARNING: PASSENGERS AND HELMET USE ON MOTORCYCLES IN MYANMAR AND NEPAL
+**TRANSFER LEARNING: PASSENGERS AND HELMET USE ON MOTORCYCLES IN MYANMAR AND NEPAL**
+
+Mobility can differ among different places. Researchers have studied how people move in Myanmar and Nepal, focusing on the usage of motorcycles. Much effort has been put into identifying, in an automated way, motorcycles from video footage using deep learning techniques and classifying the position of riders and helmets. This project has applied transfer learning from a labelled traffic dataset from Myanmar to classify the position encoding of passengers and helmets on motorcycles to a dataset from Nepal, with the aim of utilising the datasets similarities to construct a model for the latter one. The results are promising, showing the model trained on Myanmar has performed even better on the Nepal dataset.
 
 
 ## Project Structure 
@@ -92,7 +94,7 @@ mkdir logs
 bsub < ./scripts/run_on_hpc.sh 
 ```
 
-## Data set
+## Datasets
 
 Extra storage has been requested to DTU for this project. Since the provided data for Myanmar wasn't completed, we created our own copy. Moreover, to facilitate the preprocessing we made a copy of the Nepal dataset as well.
 
